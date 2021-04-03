@@ -7,6 +7,7 @@
 # constant paths
 sql_py_scripts="sql-and-python"
 results_root="tests--artifacts-and-results/kubernetes"
+graphs_dir="graphs"
 
 # paths (yet to be determined) to navigate over results
 path_for_test=""
@@ -26,15 +27,15 @@ COUNT_ZONES=10
 ####################
 
 # data points - X coordinates
-#loads=(100)
-loads=(100 200 300 400 500 600 700 800 900 1000 \
-        1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 \
-        2100 2200 2300 2400 2500)
+loads=(100 200)
+#loads=(100 200 300 400 500 600 700 800 900 1000 \
+#        1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 \
+#        2100 2200 2300 2400 2500)
 
 # graphs to perform tests on
-#graphs=("zadanie3.60.json")
+graphs=("zadanie3.60.json")
 #graphs=("zadanie3.0.json" "zadanie3.30.json")
-graphs=("zadanie3.0.json" "zadanie3.30.json" "zadanie3.60.json")
+#graphs=("zadanie3.0.json" "zadanie3.30.json" "zadanie3.60.json")
 
 #############
 # Functions #
@@ -70,7 +71,8 @@ mkdir_for_whole_test() {
 }
 
 mkdir_for_graph() {
-    path_for_graph=${path_for_test}/${1}
+    # remove file extension from name of the directory
+    path_for_graph=$(echo "${path_for_test}/${1}" | sed 's/\.[^.]*$//')
     mkdir "${path_for_graph}"
 }
 
@@ -141,7 +143,7 @@ postgres_import() {
 
 load_graph () {
     clear_redises
-    kubectl cp "graphs/$1" "${EXECUTOR}:$1"
+    kubectl cp "${graphs_dir}/$1" "${EXECUTOR}:$1"
 
     kubectl exec -it "${EXECUTOR}" -- bash -c "./run-main.sh com.github.kjarosh.agh.pp.cli.ConstantLoadClientMain -l -b 5 -n 0 -g $1 -t 3 -d 1"
 }
